@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <!-- 引入AXIOS文件 -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    // 发送请求
+    axios({
+      method: 'get',
+      url: 'http://localhost:8080/article/getAll'
+    }).then(result=>{
+
+      //成功的回调
+      console.log(result.data);
+      
+    }).catch(err=>{
+
+      //失败的回调
+      console.log(err);
+      
+    })
+
+    let article={
+      title: '明天会更好',
+      category: '生活',
+      time: '2002',
+      state: '草稿'
+    }
+
+    // axios({
+    //   method: 'post',
+    //   url: 'http://localhost:8080/article/add',
+    //   data: article
+    // }).then(result=>{
+
+    //   //成功的回调
+    //   console.log(result.data);
+      
+    // }).catch(err=>{
+
+    //   //失败的回调
+    //   console.log(err);
+      
+    // })
+  </script>
+
+</body>
+</html>
