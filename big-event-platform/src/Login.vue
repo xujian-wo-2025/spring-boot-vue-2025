@@ -1,6 +1,7 @@
 <script setup>
 import { User, Lock } from '@element-plus/icons-vue'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { ElMessage } from 'element-plus'
 //控制注册与登录表单的显示， 默认显示注册
@@ -49,8 +50,13 @@ const register = async () => {
   ElMessage.success(result.msg ? result.msg : '注册成功')
 }
 
+import { useTokenStore } from '@/stores/token.js'
+
+const router = useRouter()
+const tokenStore = useTokenStore()
 //绑定数据，复用注册表单模型
 //表单数据校验
+
 const login = async () => {
   let result = await userLoginService(registerData.value)
   // if (result.code === 0) {
@@ -60,6 +66,10 @@ const login = async () => {
   // }
   //alert(result.msg ? result.msg : '登入成功')
   ElMessage.success(result.msg ? result.msg : '登入成功')
+
+  //把得到的token存储到pinia中
+  tokenStore.setToken(result.data)
+  router.push('/')
 }
 //定义函数，清空数据模型的数据
 const clear = () => {
