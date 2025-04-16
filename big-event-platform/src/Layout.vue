@@ -1,6 +1,91 @@
 <script setup>
 import { Management, Promotion, UserFilled, User, Crop, EditPen, SwitchButton, CaretBottom } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
+
+import { userInfoService } from '@/api/user.js'
+import useUserInfoStore from '@/stores/userifo.js'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useTokenStore } from '@/stores/token.js'
+const tokenStore = useTokenStore()
+const userInfoStore = useUserInfoStore()
+
+//调用个人信息
+// const getUserInfo = async () => {
+//   //调用接口
+//   let result = await userInfoService()
+//   //将数据存储到pinia中
+//   userInfoStore.setInfo(result.data)
+// }
+const getUserInfo = async () => {
+  try {
+    // 调用接口
+    let result = await userInfoService()
+    console.log('用户信息:', result.data) // 打印返回的数据
+    // 将数据存储到 pinia 中
+    userInfoStore.setInfo(result.data)
+  } catch (error) {
+    console.error('获取用户信息失败，错误详情:', error)
+    if (error.response) {
+      // 如果是 HTTP 请求错误，打印响应信息
+      console.error('响应状态码:', error.response.status)
+      console.error('响应数据:', error.response.data)
+    }
+  }
+}
+getUserInfo()
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+//条目被点击后，调用的函数
+const handleCommand = command => {
+  //判断指令
+  if (command === 'logout') {
+    //退出登录
+    ElMessageBox.confirm('你确认要退出吗', '温馨提示', {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning'
+    })
+      .then(async () => {
+        //   let result = await articleCategoryDaleteService(row.id)
+        //   ElMessage({
+        //     type: 'success',
+        //     message: '删除成功'
+        //   })
+        //   //刷新列表
+        //   articleCategoryList()
+
+        //1 清空pinia中存储的token值及个人信息
+
+        tokenStore.removeToken()
+        userInfoStore.removeInfo()
+        //2 跳转到登录界面
+        router.push('/login')
+        try {
+          ElMessage({
+            type: 'success',
+            message: '退出登入成功'
+          })
+        } catch (error) {
+          ElMessage({
+            type: 'error',
+            message: '用户取消了退出登入'
+          })
+        }
+      })
+      .catch(() => {
+        ElMessage({
+          type: 'info',
+          message: '用户取消了删除'
+        })
+      })
+  } else {
+    //路由
+    router.push('/user/' + command)
+  }
+}
 </script>
 
 <template>
@@ -53,19 +138,22 @@ import avatar from '@/assets/default.png'
     <el-container>
       <!-- 头部区域 -->
       <el-header>
-        <div>黑马程序员：<strong>东哥</strong></div>
-        <el-dropdown placement="bottom-end">
+        <div>黑马程序员：<strong>{{ userInfoStore.info.nickname }}</strong></div>
+
+        <!-- 下拉菜单 -->
+        <!-- commend：条目被点击后会触发，在事件函数上可以声明一个函数，接受条目对应的指令 -->
+        <el-dropdown placement="bottom-end" @command="handleCommand">
           <span class="el-dropdown__box">
-            <el-avatar :src="avatar" />
+            <el-avatar :src="userInfoStore.info.userPic?userInfoStore.info.userPic:avatar" />
             <el-icon>
               <CaretBottom />
             </el-icon>
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="profile" :icon="User">基本资料</el-dropdown-item>
+              <el-dropdown-item command="info" :icon="User">基本资料</el-dropdown-item>
               <el-dropdown-item command="avatar" :icon="Crop">更换头像</el-dropdown-item>
-              <el-dropdown-item command="password" :icon="EditPen">重置密码</el-dropdown-item>
+              <el-dropdown-item command="resetPassword" :icon="EditPen">重置密码</el-dropdown-item>
               <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>

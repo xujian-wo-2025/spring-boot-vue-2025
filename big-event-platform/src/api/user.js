@@ -22,3 +22,27 @@ export const userLoginService = (loginData) => {
   return request.post('/user/login', params)
 }
 
+//获取用户详细信息
+// export const userInfoService = () => {
+//   return request.get('user/userInfo')
+// }
+
+export const userInfoService = () => {
+  return request.get('user/userInfo')
+    .catch(error => {
+      console.error('获取用户信息接口请求失败:', error)
+      throw error
+    })
+}
+
+//修改个人信息
+export const userInfoUpdateService = (userInfoData) => {
+  return request.put('/user/update', userInfoData)
+}
+
+//修改头像
+export const userAvatarUpdateService = (avatarUrl) => {
+  const params = new URLSearchParams()
+  params.append('avatarUrl', avatarUrl)
+  return request.patch('/user/updateAvatar', params)
+}

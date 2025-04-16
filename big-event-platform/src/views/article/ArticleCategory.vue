@@ -26,11 +26,12 @@ const categorys = ref([
   }
 ])
 //声明一个异步的函数
-import { articleCategoryListService, articleCategoryAddService, articelCategoryUpdateService } from '@/api/article.js'
+import { articleCategoryListService, articleCategoryDaleteService, articleCategoryAddService, articelCategoryUpdateService } from '@/api/article.js'
 const articleCategoryList = async () => {
   let result = await articleCategoryListService()
   categorys.value = result.data
 }
+
 articleCategoryList()
 //控制添加分类弹窗
 const dialogVisible = ref(false)
@@ -77,10 +78,51 @@ const updateCategory = () => {
   articleCategoryList()
   dialogVisible.value = false
 }
-
+import { ElMessageBox } from 'element-plus'
 //清空模型的数据
 const clearData = () => {
   ;(categoryModel.value.categoryName = ''), (categoryModel.value.categoryAlias = '')
+}
+
+//删除分类
+const deleteCategory = row => {
+  //提示确认框
+
+  ElMessageBox.confirm('你确认要删除吗', '温馨提示', {
+    confirmButtonText: 'OK',
+    cancelButtonText: 'Cancel',
+    type: 'warning'
+  })
+    .then(async () => {
+      //   let result = await articleCategoryDaleteService(row.id)
+      //   ElMessage({
+      //     type: 'success',
+      //     message: '删除成功'
+      //   })
+      //   //刷新列表
+      //   articleCategoryList()
+
+      try {
+        let result = await articleCategoryDaleteService(row.id)
+        ElMessage({
+          type: 'success',
+          message: '删除成功'
+        })
+        // 刷新列表
+        articleCategoryList()
+      } catch (error) {
+        ElMessage({
+          type: 'error',
+          message: '删除失败，请检查网络或重试'
+        })
+      }
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '用户取消了删除'
+      })
+    })
 }
 </script>
 <template>
@@ -100,7 +142,7 @@ const clearData = () => {
       <el-table-column label="操作" width="100">
         <template #default="{ row }">
           <el-button :icon="Edit" circle plain type="primary" @click="showDialog(row)"></el-button>
-          <el-button :icon="Delete" circle plain type="danger"></el-button>
+          <el-button :icon="Delete" circle plain type="danger" @click="deleteCategory(row)"></el-button>
         </template>
       </el-table-column>
       <template #empty>

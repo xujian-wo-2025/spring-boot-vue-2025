@@ -17,3 +17,26 @@ export const articleCategoryAddService = (categoryData) => {
 export const articelCategoryUpdateService = (categoryData) => {
   return request.put('/category', categoryData)
 }
+
+//文章分类删除
+// export const articleCategoryDaleteService = (id) => {
+//   return request.delete('/category?id' + id)
+// }
+
+// 文章分类删除
+export const articleCategoryDaleteService = (id) => {
+  return request.delete('/category', {
+    params: { id }
+  });
+};
+
+//文章列表查询
+export const articleListService = (params) => {
+  return request.get('/article', { params: params })
+}
+
+
+//文章添加
+export const articleAddService = (articleData) => {
+  return request.post('/article', articleData)
+}
